@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="60 seconds">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <!--属性,配置日志的输出路径 -->
+    <property name="log_path" value="./logs"/>
+    <property name="appName" value="chat-room"></property>
+    <!-- 项目名称 -->
+    <contextName>${appName}</contextName>
+
+    <timestamp key="bySecond" datePattern="yyyy-MM-dd HH:mm:ss" timeReference="contextBirth"/>
+
+    <!-- ConsoleApperder意思是从console中打印出来 -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 过滤器，一个appender可以有多个 -->
+        <!-- 阈值过滤，就是log行为级别过滤，debug及debug以上的信息会被打印出来 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+            <!--<onMatch>ACCEPT</onMatch>-->
+            <!--<onMismatch>DENY</onMismatch>-->
+        </filter>
+        <encoder charset="UTF-8"> <!-- encoder 可以指定字符集，对于中文输出有意义 -->
+            <!--<pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger %caller{1} :[%msg]%n</pattern>-->
+            <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss}) %yellow(%-5level) %cyan(%logger [%line] :) %green([%msg]%n)</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 滚动日志文件，这个比较常用 -->
+    <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 当project等于true的时候file就不会起效果-->
+        <!--<project>true</project>-->
+        <file>${log_path}/${appName}.log</file>
+        <!-- 按天新建log日志 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${log_path}/%d{yyyy-MM-dd}/${appName}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 保留30天的历史日志 -->
+            <maxHistory>30</maxHistory>
+            <!-- 基于大小和时间，这个可以有，可以没有 -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <!-- 当一个日志大小大于10KB，则换一个新的日志。日志名的%i从0开始，自动递增 -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder charset="UTF-8">
+            <!-- %ex就是指抛出的异常，full是显示全部，如果在{}中写入数字，则表示展示多少行 -->
+            <pattern>%-4date [%thread] %-5level %logger{} [%line]: [%msg]%n%ex{full, DISPLAY_EX_EVAL}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 这个logger详细到了类 -->
+    <logger name="com.chaofan.websocket" level="debug" additivity="false">
+        <appender-ref ref="Console"/>
+        <!--<appender-ref ref="logFiles"/>-->
+        <!--<appender-ref ref="htmlFiles"/>-->
+        <appender-ref ref="rollingFile"/>
+    </logger>
+
+</configuration>
