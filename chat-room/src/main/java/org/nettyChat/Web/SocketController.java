@@ -13,6 +13,9 @@ import java.util.*;
 @RequestMapping("/ws")
 @Slf4j
 public class SocketController {
+    public test(){
+        System.out.println("测试");
+    }
     public static Map<Long,String> img = new HashMap();
     /**
      * 根据房间号获得其中的用户
